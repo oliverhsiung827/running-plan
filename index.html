@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oliver 2026 半馬計畫 Pro</title>
+    <style>
+        :root {
+            --bg-color: #f4f4f5;
+            --card-bg: #ffffff;
+            --text-main: #18181b;
+            --text-sub: #71717a;
+            --accent-run: #0ea5e9; /* Blue: Easy/Recovery */
+            --accent-tempo: #f59e0b; /* Orange: Tempo */
+            --accent-lsd: #ef4444; /* Red: LSD */
+            --accent-gym: #3f3f46; /* Gray: Gym */
+            --border-radius: 12px;
+            --font-mono: 'SF Mono', 'Roboto Mono', monospace;
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px 16px;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 26px;
+            font-weight: 800;
+            margin: 0;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+        
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-sub);
+            font-family: var(--font-mono);
+            margin-top: 4px;
+        }
+
+        .countdown {
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-lsd);
+            background: #fef2f2;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* Zones Card */
+        .zones-card {
+            background: #27272a;
+            color: white;
+            padding: 16px;
+            border-radius: var(--border-radius);
+            margin-bottom: 24px;
+            font-size: 13px;
+        }
+        .zones-title {
+            font-weight: 700;
+            color: #d4d4d8;
+            margin-bottom: 12px;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 11px;
+        }
+        .zone-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #3f3f46;
+        }
+        .zone-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .zone-name { font-weight: 600; width: 60px; }
+        .zone-hr { font-family: var(--font-mono); color: #a1a1aa; }
+        .zone-pace { font-family: var(--font-mono); color: #fff; font-weight: 700; }
+
+        /* Schedule */
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-sub);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0 0 12px 4px;
+            display: block;
+        }
+
+        .week-card {
+            background: var(--card-bg);
+            margin-bottom: 16px;
+            padding: 18px;
+            border-radius: var(--border-radius);
+            border: 1px solid #e4e4e7;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .week-card.active {
+            border: 2px solid var(--text-main);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .week-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .week-number {
+            font-size: 18px;
+            font-weight: 800;
+            line-height: 1;
+        }
+        .week-date {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--text-sub);
+            margin-top: 4px;
+        }
+        .week-tag {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: #f4f4f5;
+            color: var(--text-sub);
+        }
+        .week-tag.peak { background: #fee2e2; color: #991b1b; }
+        .week-tag.taper { background: #dbeafe; color: #1e40af; }
+
+        /* Workouts */
+        .workout-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .workout-item {
+            display: grid;
+            grid-template-columns: 24px 1fr auto;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 700;
+            color: white;
+        }
+        .icon.tempo { background-color: var(--accent-tempo); }
+        .icon.lsd { background-color: var(--accent-lsd); }
+        .icon.rec { background-color: var(--accent-run); opacity: 0.7; }
+
+        .workout-details {
+            display: flex;
+            flex-direction: column;
+        }
+        .workout-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+        .workout-meta {
+            font-size: 11px;
+            color: var(--text-sub);
+            font-family: var(--font-mono);
+        }
+
+        .workout-dist {
+            font-size: 16px;
+            font-weight: 800;
+            font-family: var(--font-mono);
+        }
+
+        /* Note Section */
+        .note-box {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px dashed #e4e4e7;
+        }
+        .note-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .note-content {
+            font-size: 12px;
+            color: #52525b;
+            line-height: 1.5;
+        }
+        .highlight {
+            color: var(--accent-lsd);
+            font-weight: 600;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 11px;
+            color: var(--text-sub);
+            padding-bottom: 40px;
+            font-family: var(--font-mono);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>HM Training '26</h1>
+        <div class="subtitle">OLIVER'S ROADMAP // 3.28 RACE DAY</div>
+        <div id="countdown" class="countdown"></div>
+    </header>
+
+    <div class="zones-card">
+        <span class="zones-title">YOUR TRAINING ZONES (HR MAX 191)</span>
+        
+        <div class="zone-row">
+            <span class="zone-name" style="color:var(--accent-run)">E (Easy)</span>
+            <span class="zone-hr">143 - 155 bpm</span>
+            <span class="zone-pace">7:00 - 7:45 /km</span>
+        </div>
+        <div class="zone-row">
+            <span class="zone-name" style="color:var(--accent-tempo)">T (Tempo)</span>
+            <span class="zone-hr">155 - 167 bpm</span>
+            <span class="zone-pace">6:00 - 6:30 /km</span>
+        </div>
+        <div class="zone-row">
+            <span class="zone-name" style="color:var(--accent-lsd)">LSD</span>
+            <span class="zone-hr">143 - 155 bpm</span>
+            <span class="zone-pace">不看速，體感穩</span>
+        </div>
+        <div style="margin-top:10px; font-size: 10px; color:#71717a; line-height:1.4;">
+            *配速僅供參考，請優先遵照心率區間。<br>
+            *LSD 若超過 160 bpm 請降速或快走。
+        </div>
+    </div>
+
+    <span class="section-title">WEEKLY SCHEDULE</span>
+
+    <div class="week-card active" id="w1">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 1</div>
+                <div class="week-date">1/3 - 1/5 (本週末)</div>
+            </div>
+            <div class="week-tag taper">減量恢復</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">Zone 2 | 輕鬆體感</span>
+                </div>
+                <span class="workout-dist">12K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">⚡ 關鍵備註</div>
+            <div class="note-content">
+                本週重點是<span class="highlight">「忍住不跑快」</span>。前幾週加量快，這週讓膝蓋與足底筋膜休息。跑完請用滾筒徹底放鬆小腿。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w2">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 2</div>
+                <div class="week-date">1/6 - 1/12</div>
+            </div>
+            <div class="week-tag">累積期</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon tempo">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Tempo 節奏跑</span>
+                    <span class="workout-meta">熱身2k + <b>主課表</b> + 緩2k</span>
+                </div>
+                <span class="workout-dist">5K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">Zone 1-2 | < 145 bpm</span>
+                </div>
+                <span class="workout-dist">5K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">Zone 2 | 穩定輸出</span>
+                </div>
+                <span class="workout-dist">14K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">💡 執行細節</div>
+            <div class="note-content">
+                Tempo 跑時心率可達 160-165。週五恢復跑建議穿緩震最好的鞋 (Vomero 18)。週四練腿強度維持中等，不要力竭。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w3">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 3</div>
+                <div class="week-date">1/13 - 1/19</div>
+            </div>
+            <div class="week-tag">距離突破</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon tempo">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Tempo 節奏跑</span>
+                    <span class="workout-meta">心率 Z3 | 稍喘</span>
+                </div>
+                <span class="workout-dist">6K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">輕鬆跑排乳酸</span>
+                </div>
+                <span class="workout-dist">6K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">練習補給 | 帶水</span>
+                </div>
+                <span class="workout-dist">16K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">🍼 補給策略</div>
+            <div class="note-content">
+                超過 15K，身體肝醣會耗盡。請準備 1-2 包能量膠，在 <span class="highlight">8K 與 12K</span> 處練習邊跑邊吃。鞋子可試穿 Megablast 感受長距離回彈。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w4">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 4</div>
+                <div class="week-date">1/20 - 1/26</div>
+            </div>
+            <div class="week-tag taper">循環減量</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon tempo">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Tempo 節奏跑</span>
+                    <span class="workout-meta">減量不減速</span>
+                </div>
+                <span class="workout-dist">4K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">Zone 1 | 極慢</span>
+                </div>
+                <span class="workout-dist">5K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">輕鬆完成</span>
+                </div>
+                <span class="workout-dist">12K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">🛠️ 身體維修</div>
+            <div class="note-content">
+                這週跑量少，請預約物理治療或去按腳。檢查是否有脛前疼痛（Shin Splints），大體重跑者常見問題。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w5">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 5</div>
+                <div class="week-date">1/27 - 2/2</div>
+            </div>
+            <div class="week-tag">穩定累積</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon tempo">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Tempo 節奏跑</span>
+                    <span class="workout-meta">Z3-Z4 間歇感</span>
+                </div>
+                <span class="workout-dist">6K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">Zone 2</span>
+                </div>
+                <span class="workout-dist">6K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">Z2 穩速</span>
+                </div>
+                <span class="workout-dist">16K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">💡 注意事項</div>
+            <div class="note-content">
+                這週開始累積疲勞是正常的。多睡覺。週五恢復跑如果腿很重，可以改騎飛輪或快走。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w6">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 6</div>
+                <div class="week-date">2/3 - 2/9</div>
+            </div>
+            <div class="week-tag peak">深水區</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon tempo">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Tempo 節奏跑</span>
+                    <span class="workout-meta">挑戰心肺</span>
+                </div>
+                <span class="workout-dist">7K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">Zone 1-2</span>
+                </div>
+                <span class="workout-dist">6K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">關鍵距離</span>
+                </div>
+                <span class="workout-dist">18K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">⚠️ 重點提醒</div>
+            <div class="note-content">
+                18K 是半馬的一道牆。跑完後請立即補充蛋白質與碳水。週四練腿請減量 (Volume -30%)，保留腿力給週日。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w7">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 7</div>
+                <div class="week-date">2/10 - 2/16</div>
+            </div>
+            <div class="week-tag taper">過年減量</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon tempo">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Tempo 節奏跑</span>
+                    <span class="workout-meta">縮短距離</span>
+                </div>
+                <span class="workout-dist">5K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">輕鬆</span>
+                </div>
+                <span class="workout-dist">5K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">Zone 2</span>
+                </div>
+                <span class="workout-dist">12K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">🧨 春節前夕</div>
+            <div class="note-content">
+                下週是過年，這週先做減量，讓身體狀態變好，預備過年期間可能的不規律作息。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w8" style="background:#fffbeb; border-color:#fcd34d;">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 8</div>
+                <div class="week-date">2/17 - 2/23</div>
+            </div>
+            <div class="week-tag" style="background:#fef3c7; color:#b45309;">農曆春節</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon rec" style="background:#d97706;">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Easy 輕鬆跑</span>
+                    <span class="workout-meta">取代 Tempo</span>
+                </div>
+                <span class="workout-dist">6K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec" style="background:#d97706;">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">如果沒空可休</span>
+                </div>
+                <span class="workout-dist">5K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd" style="background:#b45309;">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">收心操</span>
+                </div>
+                <span class="workout-dist">16K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">🧧 假期策略</div>
+            <div class="note-content">
+                不用去健身房，徒手深蹲維持即可。飲食盡量控制，不要胖超過 2kg。重點是週日的 16K 一定要完成。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w9">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 9</div>
+                <div class="week-date">2/24 - 3/2</div>
+            </div>
+            <div class="week-tag peak">模擬考</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon tempo">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Tempo 節奏跑</span>
+                    <span class="workout-meta">目標配速</span>
+                </div>
+                <span class="workout-dist">8K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">Zone 1</span>
+                </div>
+                <span class="workout-dist">6K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">模擬比賽日</span>
+                </div>
+                <span class="workout-dist">20K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">🔥 賽前模擬</div>
+            <div class="note-content">
+                請穿上 Megablast 及比賽襪。早餐吃什麼、幾點起床，全部照比賽當天流程走一次。這週很累，撐住。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w10" style="background:#18181b; border:1px solid #18181b; color:white;">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 10</div>
+                <div class="week-date" style="color:#a1a1aa">3/3 - 3/9</div>
+            </div>
+            <div class="week-tag" style="background:#fff; color:#000;">Peak 高峰</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon tempo" style="background:#f59e0b;">三</div>
+                <div class="workout-details">
+                    <span class="workout-title" style="color:white">Tempo 節奏跑</span>
+                    <span class="workout-meta" style="color:#d4d4d8">Z3-Z4</span>
+                </div>
+                <span class="workout-dist">6K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec" style="background:#52525b;">五</div>
+                <div class="workout-details">
+                    <span class="workout-title" style="color:white">Recovery 恢復跑</span>
+                    <span class="workout-meta" style="color:#d4d4d8">輕鬆</span>
+                </div>
+                <span class="workout-dist">5K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd" style="background:#ef4444;">日</div>
+                <div class="workout-details">
+                    <span class="workout-title" style="color:white">LSD 長距離</span>
+                    <span class="workout-meta" style="color:#d4d4d8">距離頂峰</span>
+                </div>
+                <span class="workout-dist">21K</span>
+            </div>
+        </div>
+        <div class="note-box" style="border-top-color:#3f3f46;">
+            <div class="note-title" style="color:white">🏔️ 信心建立</div>
+            <div class="note-content" style="color:#a1a1aa;">
+                這週跑完，你就具備完賽能力了。如果 21K 太累，跑 18K 也可以。重點是心態不能崩。跑完這週就開始減量。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w11">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 11</div>
+                <div class="week-date">3/10 - 3/16</div>
+            </div>
+            <div class="week-tag taper">Taper I</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon tempo">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Tempo 節奏跑</span>
+                    <span class="workout-meta">距離減半 強度不變</span>
+                </div>
+                <span class="workout-dist">4K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">Zone 1</span>
+                </div>
+                <span class="workout-dist">5K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">LSD 長距離</span>
+                    <span class="workout-meta">開始修復</span>
+                </div>
+                <span class="workout-dist">14K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">📉 減量期開始</div>
+            <div class="note-content">
+                跑量減少 30%。你會覺得精力過剩，那是正常的，**不要偷練**。讓肌肉裡的微創傷修復。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" id="w12">
+        <div class="week-header">
+            <div>
+                <div class="week-number">WEEK 12</div>
+                <div class="week-date">3/17 - 3/23</div>
+            </div>
+            <div class="week-tag taper">Taper II</div>
+        </div>
+        <div class="workout-group">
+            <div class="workout-item">
+                <div class="icon rec">三</div>
+                <div class="workout-details">
+                    <span class="workout-title">Easy 輕鬆跑</span>
+                    <span class="workout-meta">保持熱度</span>
+                </div>
+                <span class="workout-dist">5K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon rec">五</div>
+                <div class="workout-details">
+                    <span class="workout-title">Recovery 恢復跑</span>
+                    <span class="workout-meta">僅熱身</span>
+                </div>
+                <span class="workout-dist">4K</span>
+            </div>
+            <div class="workout-item">
+                <div class="icon lsd">日</div>
+                <div class="workout-details">
+                    <span class="workout-title">Jog 慢跑</span>
+                    <span class="workout-meta">最後調整</span>
+                </div>
+                <span class="workout-dist">8-10K</span>
+            </div>
+        </div>
+        <div class="note-box">
+            <div class="note-title">🚫 禁止練腿</div>
+            <div class="note-content">
+                <span class="highlight">本週四絕對不要練下肢。</span> 週日跑完後，開始增加碳水化合物攝取（肝醣超補）。早點睡覺。
+            </div>
+        </div>
+    </div>
+
+    <div class="week-card" style="background:#18181b; color:white; text-align:center; padding:40px 20px;">
+        <div style="font-size:14px; letter-spacing:2px; margin-bottom:10px; color:#a1a1aa;">RACE DAY</div>
+        <div style="font-size:36px; font-weight:800; font-family:var(--font-mono); margin-bottom:10px;">3/28</div>
+        <div style="font-size:14px; color:#d4d4d8;">HALF MARATHON 21.0975 KM</div>
+        <div style="margin-top:20px; font-size:12px; color:#52525b; border-top:1px solid #3f3f46; padding-top:20px;">
+            記得貼胸貼 / 指甲剪短 / 提早2小時吃早餐<br>ENJOY THE RUN, OLIVER.
+        </div>
+    </div>
+
+    <footer>
+        OLIVER'S PERSONALIZED PLAN<br>
+        GENERATED BY GEMINI
+    </footer>
+
+</div>
+
+<script>
+    // Countdown
+    const raceDate = new Date(2026, 2, 28);
+    const today = new Date();
+    const diffTime = raceDate - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    const countDiv = document.getElementById('countdown');
+    if (diffDays > 0) countDiv.innerText = `${diffDays} DAYS TO GO`;
+    else if (diffDays === 0) countDiv.innerText = "IT'S RACE DAY!";
+    else countDiv.innerText = "COMPLETED";
+
+    // Auto-scroll to current week
+    // Logic: Define date ranges and scroll
+    // Using a simple approximation for demo
+    const currentYear = 2026;
+    const schedule = [
+        {id: 'w1', start: new Date(currentYear, 0, 3), end: new Date(currentYear, 0, 5)},
+        {id: 'w2', start: new Date(currentYear, 0, 6), end: new Date(currentYear, 0, 12)},
+        {id: 'w3', start: new Date(currentYear, 0, 13), end: new Date(currentYear, 0, 19)},
+        {id: 'w4', start: new Date(currentYear, 0, 20), end: new Date(currentYear, 0, 26)},
+        {id: 'w5', start: new Date(currentYear, 0, 27), end: new Date(currentYear, 1, 2)},
+        {id: 'w6', start: new Date(currentYear, 1, 3), end: new Date(currentYear, 1, 9)},
+        {id: 'w7', start: new Date(currentYear, 1, 10), end: new Date(currentYear, 1, 16)},
+        {id: 'w8', start: new Date(currentYear, 1, 17), end: new Date(currentYear, 1, 23)},
+        {id: 'w9', start: new Date(currentYear, 1, 24), end: new Date(currentYear, 2, 2)},
+        {id: 'w10', start: new Date(currentYear, 2, 3), end: new Date(currentYear, 2, 9)},
+        {id: 'w11', start: new Date(currentYear, 2, 10), end: new Date(currentYear, 2, 16)},
+        {id: 'w12', start: new Date(currentYear, 2, 17), end: new Date(currentYear, 2, 23)}
+    ];
+
+    // Note: This auto-scroll works if user opens it during the training period
+    schedule.forEach(week => {
+        if (today >= week.start && today <= week.end) {
+            // Remove active from w1 default and add to current
+            document.querySelectorAll('.week-card').forEach(el => el.classList.remove('active'));
+            const activeEl = document.getElementById(week.id);
+            if(activeEl) {
+                activeEl.classList.add('active');
+                setTimeout(() => activeEl.scrollIntoView({behavior: 'smooth', block: 'center'}), 500);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>
+
